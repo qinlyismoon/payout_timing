@@ -468,6 +468,7 @@ tbody td{padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:to
 .ostrip .dg-day,.pl-grid .dg-day{border-left:0;position:relative;z-index:1;background:none}
 .we-band{position:absolute;top:0;bottom:0;background:var(--surface-2);border-radius:8px;box-shadow:inset 0 0 0 1px var(--hair);z-index:0;pointer-events:none}
 .ostrip-grid > .oc-chip,.pl-grid > .pl-b{z-index:3}
+.ostrip-grid > .oc-chip{z-index:5}  /* above the hover line (overlay z 4) */
 .dg-gapcol{border-left:0}
 .dg-nd{border-left:1px dashed var(--border-strong)!important;margin-left:8px}
 .dg-nd b{color:var(--muted)!important;font-size:12px!important}
@@ -491,6 +492,8 @@ tbody td{padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:to
 .bal-lbl{position:absolute;z-index:3;font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums}
 .bal-lbl.neg{color:var(--unk-ink)}
 .bal-lbl.min{font-size:13.5px;font-weight:700}
+.bal-lbl{transition:opacity .15s ease}
+.bal-lbl.is-crossed{opacity:0}
 .bal-zlbl{position:absolute;z-index:3;font-size:11.5px;color:var(--muted)}
 .bal-title{position:absolute;left:0;z-index:3;font-size:11.5px;font-weight:600;color:var(--muted)}
 .op-dot{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border:0;background:none;padding:0;cursor:pointer;z-index:6;display:grid;place-items:center}
@@ -502,6 +505,7 @@ tbody td{padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:to
 .op-dot:focus-visible{outline:none}
 .op-tip{position:absolute;bottom:22px;left:50%;transform:translate(-50%,4px);white-space:nowrap;background:var(--text);color:var(--surface);font-size:11.5px;line-height:1.3;padding:5px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;text-align:left}
 .op-tip b{display:block;font-weight:600}
+.op-tip{display:none}  /* no text on top of the strip: the payment's name and date go to the footer result */
 .op-dot:hover .op-tip,.op-dot.active .op-tip,.op-dot:focus-visible .op-tip{opacity:1;transform:translate(-50%,0)}
 .op-tick{position:absolute;width:0;border-left:1px solid var(--border-strong);z-index:2}
 .op-sep{position:absolute;left:0;right:0;border-top:1px dashed var(--border-strong);z-index:1}
@@ -1753,6 +1757,7 @@ function showOnStrip(p){
     /* short delay so moving between payments glides instead of blinking off and on */
     hvTimer = setTimeout(function(){
       box.classList.remove("hovering");
+      [].forEach.call(box.querySelectorAll(".bal-lbl"), function(n){ n.classList.remove("is-crossed"); });
       [].forEach.call(box.querySelectorAll(".oc-chip"), function(n){ n.classList.remove("is-late", "is-maybe"); });
       [].forEach.call(box.querySelectorAll(".op-dot"), function(n){ n.classList.remove("active"); });
       [].forEach.call(document.querySelectorAll("#payBody tr"), function(n){ n.classList.remove("linked"); });
@@ -1764,11 +1769,16 @@ function showOnStrip(p){
   var iDue = Math.round((p.dueD - STRIP.start) / 864e5);
   var lineL = Math.max(0, Math.min(STRIP.N, iDue + 0.5)) * STRIP.col;
   line.style.left = lineL + "%";
+  var gr = line.parentNode.getBoundingClientRect(), lx = gr.left + gr.width * lineL / 100;
+  [].forEach.call(box.querySelectorAll(".bal-lbl"), function(n){
+    var r = n.getBoundingClientRect();
+    n.classList.toggle("is-crossed", lx > r.left - 3 && lx < r.right + 3);
+  });
   veil.style.left = lineL + "%"; veil.style.width = (100 - lineL) + "%";
   var bal = p.cash.expected - p.needed;
   var main = bal >= 0 ? '<b class="ok">' + (bal ? '+' + fmt(bal) + ' left' : 'Covered') + '</b>'
     : '<b class="neg">' + fmt(p.gapCarried ? p.gapOwn : -bal) + ' short</b>';
-  res.innerHTML = main + '<small>' + (bal < 0 && p.gapCarried ? '<span class="carry">+ ' + fmt(p.gapCarried) + ' from earlier</span> · ' : '') + 'Cash needed before ' + fd(p.dueD) + '</small>';
+  res.innerHTML = main + '<small>' + (bal < 0 && p.gapCarried ? '<span class="carry">+ ' + fmt(p.gapCarried) + ' from earlier</span> · ' : '') + p.short + ' ' + fmt(p.amount) + ', cash needed before ' + fd(p.dueD) + '</small>';
   var right = lineL > 30;
   res.classList.toggle("r", right);
   res.style.left = lineL + "%";

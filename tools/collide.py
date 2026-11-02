@@ -46,10 +46,29 @@ MEASURE = r"""
     if (el.classList.length) s += '.' + [...el.classList].slice(0, 2).join('.');
     return s;
   };
+  // stacking level inside the strip: z-index of the nearest ancestor that sets one
+  const zOf = el => {
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+      const z = getComputedStyle(n).zIndex;
+      if (z !== 'auto') return parseInt(z, 10);
+    }
+    return 0;
+  };
+  // does an ancestor (up to its chip) paint an opaque background behind this text?
+  const backed = el => {
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+      const bg = getComputedStyle(n).backgroundColor;
+      const m = bg.match(/rgba?\(([^)]+)\)/);
+      if (m) { const a = m[1].split(',').map(Number); if (a.length === 3 || a[3] === 1) return true; }
+      if (n.classList.contains('oc-chip') || n.classList.contains('pl-b')) break;
+    }
+    return false;
+  };
   const push = (kind, el, r, label) => {
     if (r.width < 1 || r.height < 1) return;
     items.push({kind, el: name(el), label: (label || '').trim().slice(0, 40),
-                x: r.left, y: r.top, w: r.width, h: r.height, id: items.length});
+                x: r.left, y: r.top, w: r.width, h: r.height, id: items.length,
+                z: zOf(el), backed: kind === 'text' && backed(el)});
   };
   for (const root of roots) {
     // 1. text: tight glyph boxes for every non-empty text node
@@ -97,6 +116,10 @@ def overlaps(items):
             kinds = {a["kind"], b["kind"]}
             if "line" in kinds and "text" not in kinds:
                 continue  # a line may pass behind a chip or dot
+            if kinds == {"line", "text"}:
+                line, txt = (a, b) if a["kind"] == "line" else (b, a)
+                if txt["z"] > line["z"] and txt["backed"]:
+                    continue  # the line runs behind an opaque chip, so it never shows across the text
             # text sitting inside its own chip is not an overlap
             if kinds == {"text", "mark"}:
                 txt, mark = (a, b) if a["kind"] == "text" else (b, a)

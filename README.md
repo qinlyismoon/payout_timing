@@ -64,7 +64,9 @@ These are the prototype's stated assumptions, not Amazon's exact schedule. Holds
 
 `tools/collide.py` measures every visible label, chip, dot, tooltip and reference line in the day strips at 1000, 1100 and 1280px — overview at rest, overview with each payment hovered, and each payment page — and lists any pair whose boxes intersect.
 
-The original checker was lost with the build session, so this is a rewrite from the spec in `docs/DESIGN.md` §5. Current result: **payment pages and the overview at rest are clean (0 overlaps)**. The overview's hover states still break §4: the tooltip covers the next payment dot and the peak balance label, and the hover line crosses the "Payout sent" chip label. These are known issues, not yet fixed.
+The original checker was lost with the build session, so this is a rewrite from the spec in `docs/DESIGN.md` §5. It measures text by its rendered glyph boxes and respects stacking (a line that runs behind an opaque chip doesn't count). Current result: **0 overlaps across all 27 states.**
+
+The first run of the rewrite found three real issues in the overview's hover state, now fixed: the hover tooltip covered the next payment dot and the peak balance label (its content moved to the footer result, so nothing is drawn on top of the strip), and the hover line crossed the "Payout sent" label (chips now sit above the line).
 
 ```bash
 pip install playwright && playwright install chromium
