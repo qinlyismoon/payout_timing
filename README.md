@@ -58,7 +58,19 @@ These are the prototype's stated assumptions, not Amazon's exact schedule. Holds
 - Animation uses CSS transitions, FLIP for list and block moves, and the View Transitions API where the browser supports it.
 - Deployed with GitHub Pages via GitHub Actions.
 
-**AI tools.** Claude and ChatGPT were used to search for first-hand evidence in parallel and to critique each other's shortlists; the direction and every judgment call were mine. The prototype was built with Claude as a coding partner against the rules in `docs/DESIGN.md`, which I wrote and revised after each review round. Every change was checked with screenshots at four widths and an overlap check on labels and chips (the checker script isn't included here).
+**AI tools.** Claude and ChatGPT were used to search for first-hand evidence in parallel and to critique each other's shortlists; the direction and every judgment call were mine. The prototype was built with Claude as a coding partner against the rules in `docs/DESIGN.md`, which I wrote and revised after each review round. Changes were reviewed with screenshots at four widths and an overlap check on labels and chips.
+
+## Overlap check
+
+`tools/collide.py` measures every visible label, chip, dot, tooltip and reference line in the day strips at 1000, 1100 and 1280px — overview at rest, overview with each payment hovered, and each payment page — and lists any pair whose boxes intersect.
+
+The original checker was lost with the build session, so this is a rewrite from the spec in `docs/DESIGN.md` §5. Current result: **payment pages and the overview at rest are clean (0 overlaps)**. The overview's hover states still break §4: the tooltip covers the next payment dot and the peak balance label, and the hover line crosses the "Payout sent" chip label. These are known issues, not yet fixed.
+
+```bash
+pip install playwright && playwright install chromium
+python3 -m http.server 8000 &
+python3 tools/collide.py http://localhost:8000/
+```
 
 ## Run locally
 
