@@ -93,7 +93,7 @@ MEASURE = r"""
       if (shown(el) && painted(el)) push('mark', el, el.getBoundingClientRect(), el.textContent);
     });
     // reference lines: they may cross marks, but never text (DESIGN.md section 4)
-    root.querySelectorAll('.os-line').forEach(el => {
+    root.querySelectorAll('.os-line, .dg-dead').forEach(el => {
       if (shown(el)) push('line', el, el.getBoundingClientRect(), '');
     });
   }
@@ -168,6 +168,19 @@ async def main():
                 await rows[i].click()
                 await page.wait_for_timeout(700)
                 await check(page, f"{w}px payment page {i + 1}, at rest", "#viewDetail .act, #viewDetail .pd-head", report)
+                # with a plan applied: every movable payout pulled as early as it goes
+                movable = await page.query_selector_all("#viewDetail .act .pl-fund.mv")
+                for k in range(len(movable)):
+                    movable = await page.query_selector_all("#viewDetail .act .pl-fund.mv")
+                    await movable[k].focus()
+                    for _ in range(20):
+                        await page.keyboard.press("ArrowLeft")
+                if movable:
+                    await page.wait_for_timeout(500)
+                    await check(page, f"{w}px payment page {i + 1}, plan applied", "#viewDetail .act, #viewDetail .pd-head", report)
+                    reset = await page.query_selector("#viewDetail .pl-reset")
+                    if reset:
+                        await reset.click()
                 await page.click("#backBtn")
                 await page.wait_for_timeout(500)
 

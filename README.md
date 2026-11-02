@@ -62,11 +62,11 @@ These are the prototype's stated assumptions, not Amazon's exact schedule. Holds
 
 ## Overlap check
 
-`tools/collide.py` measures every visible label, chip, dot, tooltip and reference line in the day strips at 1000, 1100 and 1280px — overview at rest, overview with each payment hovered, and each payment page — and lists any pair whose boxes intersect.
+`tools/collide.py` measures every visible label, chip, dot, tooltip and reference line in the day strips at 1000, 1100 and 1280px — overview at rest, overview with each payment hovered, each payment page at rest and with a plan applied — and lists any pair whose boxes intersect.
 
-The original checker was lost with the build session, so this is a rewrite from the spec in `docs/DESIGN.md` §5. It measures text by its rendered glyph boxes and respects stacking (a line that runs behind an opaque chip doesn't count). Current result: **0 overlaps across all 27 states.**
+The original checker was lost with the build session, so this is a rewrite from the spec in `docs/DESIGN.md` §5. It measures text by its rendered glyph boxes and respects stacking (a line that runs behind an opaque chip doesn't count). Current result: **0 overlaps across all 39 states.**
 
-The first run of the rewrite found three real issues in the overview's hover state, now fixed: the hover tooltip covered the next payment dot and the peak balance label (its content moved to the footer result, so nothing is drawn on top of the strip), and the hover line crossed the "Payout sent" label (chips now sit above the line).
+The first run of the rewrite found three real issues in the overview's hover state, now fixed: the hover tooltip covered the next payment dot and the peak balance label (its content moved to the footer result, so nothing is drawn on top of the strip), and the hover line crossed the "Payout sent" label (chips now sit above the line). A later run also caught the payment page's deadline line showing through the semi-transparent "+ Add your own cash" button; it now has an opaque fill.
 
 ```bash
 pip install playwright && playwright install chromium
