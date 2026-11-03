@@ -58,7 +58,7 @@ These are the prototype's stated assumptions, not Amazon's exact schedule. Holds
 - Animation uses CSS transitions, FLIP for list and block moves, and the View Transitions API where the browser supports it.
 - Deployed with GitHub Pages via GitHub Actions.
 
-**AI tools.** Claude and ChatGPT were used to search for first-hand evidence in parallel and to critique each other's shortlists; the direction and every judgment call were mine. The prototype was built with Claude as a coding partner against the rules in `docs/DESIGN.md`, which I wrote and revised after each review round. Changes were reviewed with screenshots at four widths and an overlap check on labels and chips.
+**AI tools.** Research was mostly ChatGPT; then ChatGPT and Claude searched separately and critiqued each other's shortlists; the direction and every judgment call were mine. The first version was made in Muse. From there I iterated with Claude as a coding partner, against the rules in `docs/DESIGN.md`, which I wrote and revised after each review round. Changes were reviewed with screenshots at four widths and an overlap check on labels and chips.
 
 ## Overlap check
 
