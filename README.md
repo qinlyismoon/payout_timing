@@ -32,6 +32,7 @@ The information isn't missing — it's scattered across the marketplace, account
 - **Only make draggable what the user controls.** Payout request day: yes. Own cash: when you send it and how much. A due date: only if the payee accepts changes. A payout already sent or a hold: never.
 - **Dragging is a simulation; ticking is a fact.** A plan stays a plan until you confirm each step.
 - **No financing advice.** The tool models any cash you add; it never names lenders or products.
+- **Desktop web first.** Planning is a sit-down task: the 14-day strip needs room and dragging needs a precise pointer, and sellers likely run Seller Central and pay suppliers at a desk. This is an assumption, not tested. Phone width works (the strip scrolls in its own container), but a phone version would be about alerts and quick confirms, not planning.
 
 The full working rules (visual language, collision rules, motion, ship checklist) are in [`docs/DESIGN.md`](docs/DESIGN.md).
 
@@ -50,7 +51,7 @@ These are the prototype's stated assumptions, not Amazon's exact schedule. Holds
 | **Based on public evidence** | The DD+7 rule change and seller complaints about cash flow and visibility (Amazon Seller Forums, EcommerceBytes, Shopify Community). |
 | **Design assumptions** | That sellers need a bill-by-bill view rather than more payout statuses; that drag-to-plan helps them decide. Not yet tested with sellers. |
 | **Simulated** | Every order, amount, payee and date. No real marketplace or bank connection. |
-| **Not built** | Real data import, notifications, multi-currency, other marketplaces. |
+| **Not built** | Real data import, phone alerts and quick confirms, multi-currency, other marketplaces. |
 
 ## Stack
 
